@@ -1,0 +1,2 @@
+ldapadd -x -H ldap://<ECP_APPLICATION_CLUSTER_URL>:389 -D "cn=admin,dc=example,dc=org" -w admin -f /container/service/slapd/assets/config/bootstrap/ldif/custom/01-default-users.ldif
+ldapsearch -x -H ldap://<ECP_APPLICATION_CLUSTER_URL>:389 -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin "uid=Trainee_01"

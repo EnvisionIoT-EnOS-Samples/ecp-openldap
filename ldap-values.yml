@@ -1,0 +1,203 @@
+# Default values for openldap.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# Define deployment strategy - IMPORTANT: use rollingUpdate: null when use Recreate strategy.
+# It prevents from merging with existing map keys which are forbidden.
+strategy: {}
+  # type: RollingUpdate
+  # rollingUpdate:
+  #   maxSurge: 1
+  #   maxUnavailable: 0
+  #
+  # or
+  #
+  # type: Recreate
+  # rollingUpdate: null
+image:
+  # From repository https://github.org/osixia/docker-openldap
+  repository: osixia/openldap
+  tag: 1.2.4
+  pullPolicy: IfNotPresent
+
+# Spcifies an existing secret to be used for admin and config user passwords
+existingSecret: ""
+
+# settings for enabling TLS
+tls:
+  enabled: false
+  secret: ""  # The name of a kubernetes.io/tls type secret to use for TLS
+  CA:
+    enabled: false
+    secret: ""  # The name of a generic secret to use for custom CA certificate (ca.crt)
+## Add additional labels to all resources
+extraLabels: {}
+## Add additional annotations to pods
+podAnnotations: {}
+service:
+  annotations: {}
+
+  ldapPort: 389
+  sslLdapPort: 636  # Only used if tls.enabled is true
+  ## List of IP addresses at which the service is available
+  ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+  ##
+  externalIPs: []
+
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  type: ClusterIP
+
+# Default configuration for openldap as environment variables. These get injected directly in the container.
+# Use the env variables from https://github.org/osixia/docker-openldap#beginner-guide
+env:
+  LDAP_ORGANISATION: "Example Org"
+  LDAP_DOMAIN: "example.org"
+  LDAP_BACKEND: "hdb"
+  LDAP_TLS: "true"
+  LDAP_TLS_ENFORCE: "false"
+  LDAP_REMOVE_ONFIG_AFTER_SETUP: "true"
+
+# Default Passwords to use, stored as a secret. If unset, passwords are auto-generated.
+# You can override these at install time with
+# helm install openldap --set openldap.adminPassword=<passwd>,openldap.configPassword=<passwd>
+adminPassword: admin
+configPassword: config
+
+# Custom openldap configuration files used to override default settings
+customLdifFiles:
+  01-default-users.ldif: |-
+    # Predefine users here
+    dn: uid=Trainee_01,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_01
+    sn: Trainee_01
+    mail: trainee_01@example.org
+    mobile: 1234567891
+    uid: Trainee_01
+    userPassword: Trainee_01
+
+    dn: uid=Trainee_02,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_02
+    sn: Trainee_02
+    mail: trainee_02@example.org
+    mobile: 1234567892
+    uid: Trainee_02
+    userPassword: Trainee_02
+
+    dn: uid=Trainee_03,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_03
+    sn: Trainee_03
+    mail: trainee_03@example.org
+    mobile: 1234567893
+    uid: Trainee_03
+    userPassword: Trainee_03
+
+    dn: uid=Trainee_04,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_04
+    sn: Trainee_04
+    mail: trainee_04@example.org
+    mobile: 1234567894
+    uid: Trainee_04
+    userPassword: Trainee_04
+
+    dn: uid=Trainee_05,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_05
+    sn: Trainee_05
+    mail: trainee_05@example.org
+    mobile: 1234567895
+    uid: Trainee_05
+    userPassword: Trainee_05
+
+    dn: uid=Trainee_06,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_06
+    sn: Trainee_06
+    mail: trainee_06@example.org
+    mobile: 1234567896
+    uid: Trainee_06
+    userPassword: Trainee_06
+
+    dn: uid=Trainee_07,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_07
+    sn: Trainee_07
+    mail: trainee_07@example.org
+    mobile: 1234567897
+    uid: Trainee_07
+    userPassword: Trainee_07
+
+    dn: uid=Trainee_08,dc=example,dc=org
+    changetype: add
+    objectClass: top
+    objectClass: inetOrgPerson
+    cn: Trainee_08
+    sn: Trainee_08
+    mail: trainee_08@example.org
+    mobile: 1234567898
+    uid: Trainee_08
+    userPassword: Trainee_08
+
+## Persist data to a persistent volume
+persistence:
+  enabled: false
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 8Gi
+  # existingClaim: ""
+
+resources: {}
+ # requests:
+ #   cpu: "100m"
+ #   memory: "256Mi"
+ # limits:
+ #   cpu: "500m"
+ #   memory: "512Mi"
+
+initResources: {}
+ # requests:
+ #   cpu: "100m"
+ #   memory: "128Mi"
+ # limits:
+ #   cpu: "100m"
+ #   memory: "128Mi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## test container details
+test:
+  enabled: false
+  image:
+    repository: dduportal/bats
+    tag: 0.4.0
